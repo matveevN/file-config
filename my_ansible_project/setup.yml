@@ -1,6 +1,10 @@
 ---
 - hosts: local
   tasks:
+    - name: Notify about starting the package installation
+      debug:
+        msg: "Starting installation of necessary packages..."
+
     - name: Install necessary packages
       package:
         name:
@@ -8,25 +12,31 @@
           - nvim
           - firefox
           - telegram-desktop   # Telegram
-          - rofi                # Rofi
-          - thunar              # Thunar
-          - flameshot           # Flameshot
-          - wezterm             # WezTerm
-          - vlc                 # VLC media player
-          - qalculate           # Qalculate!
-          - btop                # btop
-          - obs-studio          # OBS Studio
-          - gcc                 # GCC compiler
-          - make                # Make utility
-          - cmake               # CMake build system
-          - gcc-c++             # C++ support for GCC
-          - feh                 # Lightweight image viewer
-          - redshift            # Adjusts color temperature
-          - dunst               # Lightweight notification daemon
-          - fzf                 # Command-line fuzzy finder
-          - zoxide              # Smart cd command
-          - tmux                # Terminal multiplexer
-          - fastfetch           # Fast fetching tool for system information
-          - gdb                 # GNU Debugger
+          - rofi               # Rofi
+          - thunar             # Thunar
+          - flameshot          # Flameshot
+          - wezterm            # WezTerm
+          - vlc                # VLC media player
+          - qalculate          # Qalculate!
+          - btop               # btop
+          - obs-studio         # OBS Studio
+          - gcc                # GCC compiler
+          - make               # Make utility
+          - cmake              # CMake build system
+          - gcc-c++            # C++ support for GCC
+          - feh                # Lightweight image viewer
+          - redshift           # Adjusts color temperature
+          - dunst              # Lightweight notification daemon
+          - fzf                # Command-line fuzzy finder
+          - zoxide             # Smart cd command
+          - tmux               # Terminal multiplexer
+          - fastfetch          # Fast fetching tool for system information
+          - gdb                # GNU Debugger
         state: present
+      register: install_result
+
+    - name: Notify about successful package installation
+      debug:
+        msg: "All packages were installed successfully!"
+      when: install_result.changed
 
