@@ -1,42 +1,50 @@
 ---
 - hosts: local
   tasks:
-    - name: Notify about starting the package installation
+    - name: Уведомление о начале установки пакетов
       debug:
-        msg: "Starting installation of necessary packages..."
+        msg: "Начинаем установку необходимых пакетов..."
 
-    - name: Install necessary packages
+    - name: Установка каждого пакета индивидуально и захват ошибок
       package:
-        name:
-          - git
-          - nvim
-          - firefox
-          - telegram-desktop   # Telegram
-          - rofi               # Rofi
-          - thunar             # Thunar
-          - flameshot          # Flameshot
-          - wezterm            # WezTerm
-          - vlc                # VLC media player
-          - qalculate          # Qalculate!
-          - btop               # btop
-          - obs-studio         # OBS Studio
-          - gcc                # GCC compiler
-          - make               # Make utility
-          - cmake              # CMake build system
-          - gcc-c++            # C++ support for GCC
-          - feh                # Lightweight image viewer
-          - redshift           # Adjusts color temperature
-          - dunst              # Lightweight notification daemon
-          - fzf                # Command-line fuzzy finder
-          - zoxide             # Smart cd command
-          - tmux               # Terminal multiplexer
-          - fastfetch          # Fast fetching tool for system information
-          - gdb                # GNU Debugger
+        name: "{{ item }}"
         state: present
-      register: install_result
+      loop:
+        - git
+        - nvim
+        - firefox
+        - telegram-desktop   # Telegram
+        - rofi               # Rofi
+        - thunar             # Thunar
+        - flameshot          # Flameshot
+        - wezterm            # WezTerm
+        - vlc                # VLC media player
+        - qalculate          # Qalculate!
+        - btop               # btop
+        - obs-studio         # OBS Studio
+        - gcc                # GCC compiler
+        - make               # Make utility
+        - cmake              # CMake build system
+        - gcc-c++            # C++ support for GCC
+        - feh                # Lightweight image viewer
+        - redshift           # Adjusts color temperature
+        - dunst              # Lightweight notification daemon
+        - fzf                # Command-line fuzzy finder
+        - zoxide             # Smart cd command
+        - tmux               # Terminal multiplexer
+        - fastfetch          # Fast fetching tool for system information
+        - gdb                # GNU Debugger
+      register: install_results
+      ignore_errors: true
 
-    - name: Notify about successful package installation
+    - name: Сбор и вывод пакетов, которые не удалось установить
       debug:
-        msg: "All packages were installed successfully!"
-      when: install_result.changed
+        msg: "Не удалось установить следующие пакеты: {{ item.item }}"
+      loop: "{{ install_results.results | selectattr('failed', 'defined') | list }}"
+      when: install_results is defined and install_results.results | selectattr('failed', 'defined') | list | length > 0
+
+    - name: Уведомление об успешной установке пакетов, если все установлены
+      debug:
+        msg: "Все пакеты были установлены успешно!"
+      when: install_results is defined and install_results.results | selectattr('failed', 'undefined') | list | length == install_results.results | length
 
